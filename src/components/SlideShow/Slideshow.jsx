@@ -1,30 +1,36 @@
-import React, { useRef } from 'react'
-import img1 from '../../assets/images/acuáticos.png';
-import img2 from '../../assets/images/dinos.png';
+import React, { useRef, useEffect, useCallback } from 'react'
+import img1 from '../../assets/images/peces.png';
+import img2 from '../../assets/images/dinosaurios.png';
 import img3 from '../../assets/images/mascotas.png';
+import logoIcon from '../../assets/images/logo-icon.png';
 import { AiOutlineLeft, AiOutlineRight } from "react-icons/ai";
 import styled from 'styled-components';
+import '../Pages/Pages.css'
 
-const Slideshow = () => {
+const Slideshow = ({
+		velocidad="1000",
+		intervalo="5000"
+}) => {
     const slideshow = useRef(null);
+    const intervaloSlideshow = useRef(null);
 
-    const next = () =>{
+    const next = useCallback(() =>{
         //comprueba si tiene elementos
         if (slideshow.current.children.length > 0) {
             //Se obtiene el primer elemento
             const firstElement = slideshow.current.children[0];
 
             //Se establece la transicion
-            slideshow.current.style.transition = `500ms ease-out all`;
+            slideshow.current.style.transition = `${velocidad}ms ease-out all`;
 
             //Se obtiene el tamaño
-            const size = slideshow.current.children[0].offsetWidth;
+            const sizeSlide = slideshow.current.children[0].offsetWidth;
 
             //Movimiento
-            slideshow.current.style.transform = `translateX(-${size}px)`
+            slideshow.current.style.transform = `translateX(-${sizeSlide}px)`
 
             const transition = () =>{
-                //Cambio de posicion de imagenes al principio
+                //Reinicio de posicion del slideshow
             slideshow.current.style.transition = 'none';
             slideshow.current.style.transform = `translateX(0)`;
 
@@ -37,9 +43,9 @@ const Slideshow = () => {
             //Evenlistener para cuando termina la animación.
             slideshow.current.addEventListener('transitionend', transition);
         }
-    }
+    }, [velocidad]);
     
-    const prior = () =>{
+    const prior = () => {
         if (slideshow.current.children.length > 0) {
             //Obtiene el ultimo elemento
             const index = slideshow.current.children.length -1;
@@ -49,15 +55,30 @@ const Slideshow = () => {
 
             slideshow.current.style.transition = 'none';
 
-            const size = slideshow.current.children[0].offsetWidth;
-            slideshow.current.style.transform = `translateX(-${size}px)`;
+            const sizeSlide = slideshow.current.children[0].offsetWidth;
+            slideshow.current.style.transform = `translateX(-${sizeSlide}px)`;
 
             setTimeout(()=>{
-                slideshow.current.style.transition = '500ms ease-out all';
+                slideshow.current.style.transition = `${velocidad}ms ease-out all`;
                 slideshow.current.style.transform = `translateX(0)`;
             }, 30);
         }
     }
+    useEffect(() => {
+        intervaloSlideshow.current = setInterval(() => {
+            next();
+        }, intervalo);
+        // Eliminamos los intervalos
+			slideshow.current.addEventListener('mouseenter', () => {
+				clearInterval(intervaloSlideshow.current);
+			});
+        // Volvemos a poner el intervalo cuando saquen el cursor del slideshow
+        slideshow.current.addEventListener('mouseleave', () => {
+            intervaloSlideshow.current = setInterval(() => {
+                next();
+            }, intervalo);
+        });
+    }, [])
 
     return (
     <Box>
@@ -65,19 +86,25 @@ const Slideshow = () => {
             <Slide>
                 <img src={img1} alt="acuaticos" />
                 <TextSlide>
-                    <p>Animales acuáticos</p>
+                    <div className='text-pet'>
+                    <p>Peces</p>
+                    </div>
                 </TextSlide>
             </Slide>
             <Slide>
                 <img src={img2} alt="dinos" />
                 <TextSlide>
+                    <div className='text-pet'>
                     <p>Dinosaurios</p>
+                    </div>
                 </TextSlide>
             </Slide>
             <Slide>
                 <img src={img3} alt="mascotas" />
                 <TextSlide>
+                    <div className='text-pet'>
                     <p>Mascotas</p>
+                    </div>
                 </TextSlide>
             </Slide>
         </BoxSlideShow>
@@ -89,6 +116,15 @@ const Slideshow = () => {
                 <AiOutlineRight />
             </Btn>
         </Arrow>
+        <div className='text'>
+            <div className='logo-icon'>
+            <img src={logoIcon} alt="logo-icon" />
+            </div>
+            <div>
+            <h1>Crea tu propio diccionario...</h1>
+            <p>...interactvo, didáctico y simple</p>
+            </div>
+        </div>
     </Box>
   )
 }
@@ -119,6 +155,12 @@ position: absolute;
 bottom: 0;
 margin: 0 25%;
 border-radius:25px 25px 0 0;
+@media screen and (max-width: 700px){
+    padding: 0;
+    border-radius: 15px 15px 0 0;
+    height:20px;
+    font-size: 16px;
+}
 `
 const BoxSlideShow = styled.div`
 display: flex;
@@ -129,7 +171,7 @@ position: absolute;
 top: 0;
 z-index: 20;
 width: 100%;
-height: 50%;
+height: 30%;
 margin-top: 10% ;
 pointer-event: none;
 `
@@ -141,12 +183,12 @@ border: none;
 cursor: pointer;
 outline: none;
 width: 50px;
-font-size: 50px;
-height: 100%;
+font-size: 30px;
+height: 80%;
 text-align: center;
 position: absolute;
 transition: .3s all ease;
-
+border-radius: 30px;
 &:hover {
     background: rgba(0,0,0,.2);
 }
